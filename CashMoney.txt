@@ -1,0 +1,85 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package magasin.vue;
+
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.Random;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import magasin.controleur.Controleur;
+
+/**
+ *
+ * @author Xav
+ */
+public class CashMoney extends JComponent{
+    
+    private boolean isActivated;
+    private Controleur controleur;
+    private Dimension pnlSize;
+    private int limiteInvisible = -100;
+    private int limiteVisible = 0;
+    private ImageIcon imgActif = new ImageIcon("CashMoney(100x100).gif");
+    private ImageIcon imgInactif = new ImageIcon("CashMoney2(100x100).gif");
+    private ImageIcon currentImg;
+    private Random rnd = new Random();
+    private int rndInt = rnd.nextInt(770)+130;
+    public CashMoney(final Controleur controleur, Dimension pnlSize){
+        this.controleur=controleur;
+        this.isActivated=true;
+        currentImg=imgActif;
+        this.pnlSize=pnlSize;
+        this.setSize(100,100);
+        this.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e){
+                if (isActivated) {
+                    controleur.addCash(25);
+                ((CashMoney)e.getSource()).isActivated=false;
+                currentImg=imgInactif;
+                }
+            }
+            
+        });
+        
+    }
+    
+    @Override
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        g.drawImage(currentImg.getImage(), 0, 0, this);
+    }
+    
+    public void actualiser(){
+        int intervalleRespawn=60*10;
+        if (controleur.getTime()%intervalleRespawn==0) {
+            rndInt = rnd.nextInt(770)+130;
+            this.isActivated=true;
+            currentImg=imgActif;
+        }
+        
+        int posiX=this.getX();
+        int posiY=rndInt;
+        if (isActivated) {
+                posiX+=3;
+                if (posiX>limiteVisible) {
+                    posiX=limiteVisible;
+            }
+        }
+        else if (!isActivated){
+                posiX-=3;
+                if (posiX<limiteInvisible) {
+                    posiX=limiteInvisible;
+                }
+        }
+        this.setLocation(posiX,posiY);
+    }    
+}
